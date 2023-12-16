@@ -3,6 +3,9 @@ const mongoose = require('mongoose');
 const app = express();
 const cors = require('cors');
 app.use(cors());
+app.use(express.json());
+const Hotel = require('../hotelbooking-backend/pages/hotelSchema');
+const User = require('../hotelbooking-backend/pages/userSchema');
 
 const url = 'mongodb://localhost:27017/hotelbooking';
 
@@ -17,19 +20,6 @@ mongoose.connect(url, {
         console.error('Error connecting to MongoDB:', error);
     });
 
-const hotelSchema = new mongoose.Schema({
-    id: Number,
-    name: String,
-    location: String,
-    city: String,
-    image: String,
-    tag1: String,
-    tag2: String,
-    tag3: String,
-    price: Number
-});
-
-const Hotel = mongoose.model('Hotel', hotelSchema);
 
 app.get('/', (req, res) => {
     res.send('Hello');
@@ -44,6 +34,38 @@ app.get('/hotels', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
+// app.post('/adduser', async (req, res) => {
+//     req.body
+//     try {
+//         const users = await User.add();
+//         res.json(users);
+//     } catch (error) {
+//         console.error('Error on submission!', error);
+//         res.status(500).send('Internal Server Error');
+//     }
+// })
+
+app.post('/adduser', async (req, res) => {
+    try {
+        const { email, firstname, message, phone, surname } = req.body;
+        const newUser = new User({
+            email,
+            firstname,
+            message,
+            phone,
+            surname
+        });
+        const savedUser = await newUser.save();
+
+        // Respond with the saved user data
+        res.json(savedUser);
+    } catch (error) {
+        // Handle errors
+        console.error('Error on submission:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
 
 app.get('/hotels/:hotelId', async (req, res) => {
     const hotelId = req.params.hotelId;
