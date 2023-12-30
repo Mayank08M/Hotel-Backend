@@ -34,16 +34,6 @@ app.get('/hotels', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
-// app.post('/adduser', async (req, res) => {
-//     req.body
-//     try {
-//         const users = await User.add();
-//         res.json(users);
-//     } catch (error) {
-//         console.error('Error on submission!', error);
-//         res.status(500).send('Internal Server Error');
-//     }
-// })
 
 app.post('/adduser', async (req, res) => {
     try {
@@ -66,6 +56,11 @@ app.post('/adduser', async (req, res) => {
     }
 });
 
+// mysql query for userlogin api
+//SELECT users.name AS user_name, users.email, core_roles.name as Role
+//FROM users
+//INNER JOIN core_model_has_roles ON core_model_has_roles.model_id = users.id
+//INNER JOIN core_roles ON core_roles.id = core_model_has_roles.role_id where core_roles.id = 2;
 
 app.get('/hotels/:hotelId', async (req, res) => {
     const hotelId = req.params.hotelId;
@@ -85,6 +80,23 @@ app.get('/hotels/:hotelId', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
+
+app.get('/suggestions/:term', async (req, res) => {
+    const { term } = req.params;
+    try {
+      const regex = new RegExp(term, 'i'); // Case-insensitive regex for partial matching
+      const suggestions = await Hotel.find({
+        $or: [
+          { name: { $regex: regex } },
+          { city: { $regex: regex } }
+          // Add more fields for additional suggestions if needed
+        ]
+      }).limit(10);
+      res.json(suggestions);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
 
 const PORT = 8000;
 app.listen(PORT, () => {
