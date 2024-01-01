@@ -2,16 +2,32 @@
 const mongoose = require('mongoose');
 
 const hotelSchema = new mongoose.Schema({
-    id: Number,
-    name: String,
+    name: {
+      type: String,
+      required: true
+    },
     location: String,
     city: String,
     image: String,
-    tag1: String,
-    tag2: String,
-    tag3: String,
-    price: Number
-});
+    tags: [String], // Array of strings for tags
+    facilities: {
+      AC: String,
+      TV: String,
+      bed: String
+      // Add more facilities as needed
+    },
+    prices: {
+      finalPrice: Number,
+      basePrice: Number,
+      perNight: Number,
+      serviceCharge: Number,
+      cleaningCharge: Number
+    },
+    occupancy: {
+      person: String
+      // Add more occupancy details as needed
+    }
+  });
 
 const Hotel = mongoose.model('Hotel', hotelSchema);
 module.exports = Hotel; 
